@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Search Users{% endblock %}
+{% block header %}
+  <h1>Search Users</h1>
+{% endblock %}
+{% block content %}
+  <form method="get" action="{{ url_for('rep.search_users') }}">
+    <input type="text" name="q" placeholder="Search by username, name, or email" value="{{ query }}" required />
+    <button type="submit" class="fancy-btn">Search</button>
+  </form>
+
+  {% if users %}
+    <h2>Results</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>User Type</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+          <tr>
+            <td>{{ u.username }}</td>
+            <td>{{ u.f_name }} {{ u.l_name }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.user_type }}</td>
+            <td><a href="{{ url_for('rep.edit_user', user_id=u.id) }}">Edit</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% elif query %}
+    <p>No users found.</p>
+  {% endif %}
+{% endblock %}

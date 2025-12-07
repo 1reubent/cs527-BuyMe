@@ -1,0 +1,462 @@
+html {
+  font-family: sans-serif;
+  background: #eee;
+  padding: 1rem;
+}
+body {
+  max-width: 960px;
+  margin: 0 auto;
+  background: white;
+}
+h1 {
+  font-family: serif;
+  color: #377ba8;
+  margin: 1rem 0;
+}
+a {
+  color: #377ba8;
+}
+hr {
+  border: none;
+  border-top: 1px solid lightgray;
+}
+nav {
+  background: lightgray;
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  justify-content: space-between; /* This will push elements apart */
+}
+
+nav h1 {
+  margin: 0;
+  /* Remove flex: auto to prevent it from taking all space */
+}
+
+nav h1 a {
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Style the first ul (left side) */
+nav ul:first-of-type {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-left: 1rem; /* Add some space between h1 and first ul */
+}
+
+/* Style the second ul (right side) */
+nav ul:last-of-type {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  margin-left: auto; /* This pushes it to the right */
+}
+
+nav ul li a,
+nav ul li span,
+header .action {
+  display: block;
+  padding: 0.5rem;
+}
+.content {
+  padding: 0 1rem 1rem;
+}
+.content > header {
+  border-bottom: 1px solid lightgray;
+  display: flex;
+  align-items: flex-end;
+}
+.content > header h1 {
+  flex: auto;
+  margin: 1rem 0 0.25rem 0;
+}
+.flash {
+  margin: 1em 0;
+  padding: 1em;
+  background: #cae6f6;
+  border: 1px solid #377ba8;
+}
+.post > header {
+  display: flex;
+  align-items: flex-end;
+  font-size: 0.85em;
+}
+.post > header > div:first-of-type {
+  flex: auto;
+}
+.post > header h1 {
+  font-size: 1.5em;
+  margin-bottom: 0;
+}
+.post,
+.about,
+.likes {
+  color: slategray;
+  font-style: italic;
+}
+.post .body {
+  white-space: pre-line;
+}
+.content:last-child {
+  margin-bottom: 0;
+}
+.content form {
+  margin: 1em 0;
+  display: flex;
+  flex-direction: column;
+}
+.content label {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+.content input,
+.content textarea {
+  margin-bottom: 1em;
+}
+.content textarea {
+  min-height: 12em;
+  resize: vertical;
+}
+input.danger {
+  color: #cc2f2e;
+}
+input[type="submit"] {
+  align-self: start;
+  min-width: 10em;
+}
+
+#like_button {
+  float: right;
+  /* padding: 1px 6px;
+  border: 1px outset buttonborder;
+  border-radius: 3px;
+  color: buttontext;
+  background-color: buttonface;
+  text-decoration: none; */
+}
+
+/* Profile-specific styles */
+.profile-section {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.profile-section h2 {
+  color: #377ba8;
+  margin-top: 0;
+  border-bottom: 2px solid #377ba8;
+  padding-bottom: 0.5rem;
+}
+
+.user-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  padding: 0.5rem;
+  background: white;
+  border-radius: 4px;
+  border-left: 3px solid #377ba8;
+}
+
+.auctions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.auction-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.auction-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.auction-card h3 {
+  color: #377ba8;
+  margin-top: 0;
+}
+
+.auction-title {
+  color: #377ba8;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  font-size: 1.5em;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+}
+
+.auction-description-main {
+  color: #555;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-left: 3px solid #377ba8;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.item-info {
+  margin: 1rem 0;
+  padding: 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+}
+
+.item-name {
+  color: #2c5f8a;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+.item-description {
+  color: #666;
+  font-style: italic;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.auction-description {
+  color: #666;
+  font-style: italic;
+  margin: 0.5rem 0;
+}
+
+.auction-details {
+  margin: 1rem 0;
+}
+
+.detail-item {
+  margin: 0.25rem 0;
+  font-size: 0.9em;
+}
+
+.auction-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.action-btn {
+  background: #377ba8;
+  color: white;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9em;
+  transition: background 0.2s;
+}
+
+.action-btn:hover {
+  background: #2c5f8a;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.stat-card h3 {
+  font-size: 2em;
+  color: #377ba8;
+  margin: 0;
+}
+
+.stat-card p {
+  margin: 0.5rem 0 0 0;
+  color: #666;
+}
+
+.no-data {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  padding: 2rem;
+}
+
+.login-prompt {
+  text-align: center;
+  padding: 2rem;
+}
+
+.login-prompt h2 {
+  color: #377ba8;
+}
+
+/* Status indicators */
+.status-active {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-ended {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.status-upcoming {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.bid-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+.bid-leading {
+  background: #d4edda;
+  color: #155724;
+}
+
+.bid-outbid {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.bid-won {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.bid-lost {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* Search form styles */
+.content .search-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 2rem 0;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.content .search-input {
+  margin: 0;
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.content .search-input:focus {
+  outline: none;
+  border-color: #377ba8;
+  box-shadow: 0 0 0 3px rgba(55, 123, 168, 0.1);
+}
+
+.search-type {
+  padding: 0.75rem 1rem;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.search-type:hover {
+  border-color: #377ba8;
+}
+
+.fancy-btn {
+  padding: 0.75rem 2rem;
+  background: #377ba8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.fancy-btn:hover {
+  background: #2c5f8a;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(55, 123, 168, 0.2);
+}
+
+.fancy-btn:active {
+  transform: translateY(0);
+}
+
+.auctions-container {
+  margin-top: 2rem;
+  min-height: 400px;
+}
+/* .new-auction-btn {
+  display: inline-block;
+  background: linear-gradient(90deg, #10b981 60%, #059669 100%);
+  color: #fff;
+  padding: 0.6em 1.4em;
+  border-radius: 24px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.07);
+  border: none;
+  margin-top: 0.5em;
+  margin-bottom: 0.7em;
+  letter-spacing: 0.03em;
+} */
+/* .new-auction-btn:hover {
+  background: linear-gradient(90deg, #059669 40%, #10b981 100%);
+  color: #e8fff7;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.13);
+  text-decoration: none;
+} */
+.new-auction-btn {
+  padding: 0.6em 1.4em;
+  margin-top: 16px;
+  margin-bottom: 4px;
+  background: #377ba8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}

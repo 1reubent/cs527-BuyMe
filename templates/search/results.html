@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block header %}
+  <h1>
+    {% block title %}Search Results{% endblock %}
+  </h1>
+{% endblock %}
+{% block content %}
+  <!-- Search form (same as index) -->
+  <form action="{{ url_for('search.search') }}"
+        method="get"
+        class="search-form">
+    <input type="text"
+           name="q"
+           placeholder="Search auctions or users..."
+           value="{{ query }}"
+           required
+           class="search-input" />
+    <select name="type" class="search-type">
+      <option value="auction" {% if search_type == 'auction' %}selected{% endif %}>Auctions</option>
+      <option value="user" {% if search_type == 'user' %}selected{% endif %}>Users</option>
+    </select>
+    <button type="submit" class="fancy-btn">Search</button>
+  </form>
+  <!-- results container -->
+  <div class="results-container">
+    {% if query %}
+      <h2>Results for "{{ query }}"</h2>
+      {% if results %}
+        {% if search_type == 'auction' %}
+          <!-- Display auction results -->
+          <div class="auctions-grid">
+            {% for result in results %}
+              <div class="auction-card">
+                <h3>{{ result['item_name'] }}</h3>
+                <p class="auction-description">{{ result['item_desc'] }}</p>
+                <div class="auction-details">
+                  <p class="detail-item">
+                    <strong>Category:</strong> {{ result['category_name'] or 'Uncategorized' }}
+                  </p>
+                  <p class="detail-item">
+                    <strong>Seller:</strong> {{ result['seller_username'] }}
+                  </p>
+                  <p class="detail-item">
+                    <strong>Starting Price:</strong> ${{ "%.2f"|format(result['starting_price']) }}
+                  </p>
+                  <p class="detail-item">
+                    <strong>Current Highest Bid:</strong> ${{ "%.2f"|format(result['current_highest_bid']) }}
+                  </p>
+                  <p class="detail-item">
+                    <strong>Start:</strong> {{ result['auction_start'] }}
+                  </p>
+                  <p class="detail-item">
+                    <strong>End:</strong> {{ result['auction_end'] }}
+                  </p>
+                </div>
+                <div class="auction-actions">
+                  <a href="#" class="action-btn">View Details</a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <!-- Display user results -->
+          <div class="users-grid">
+            {% for result in results %}
+              <div class="user-card">
+                <h3>{{ result['username'] }}</h3>
+                <p class="detail-item">
+                  <strong>Name:</strong> {{ result['f_name'] or '' }} {{ result['l_name'] or '' }}
+                </p>
+                <p class="detail-item">
+                  <strong>Type:</strong> {{ result['user_type'] }}
+                </p>
+                <div class="auction-actions">
+                  <a href="#" class="action-btn">View Profile</a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% else %}
+        <p class="no-data">No results found for "{{ query }}"</p>
+      {% endif %}
+    {% else %}
+      <p class="no-data">Enter a search query to find auctions or users</p>
+    {% endif %}
+  </div>
+{% endblock %}

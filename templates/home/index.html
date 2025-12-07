@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block header %}
+  <h1>
+    {% block title %}Home{% endblock %}
+  </h1>
+  {% if g.user %}
+    <a href="{{ url_for("home.create_auction") }}">
+      <button class="fancy-btn new-auction-btn">New Auction</button>
+    </a>
+  {% endif %}
+  <!-- {{ url_for("home.create_auction") }}" -->
+{% endblock %}
+{% block content %}
+  <!--
+  search bar
+  left: list of current aucitons
+  right: partial list of users.
+-->
+  <form action="{{ url_for("search.search") }}"
+        method="get"
+        class="search-form">
+    <input type="text"
+           name="q"
+           placeholder="Search auctions or users..."
+           required
+           class="search-input" />
+    <select name="type" class="search-type">
+      <option value="auction">Auctions</option>
+      <option value="user">Users</option>
+    </select>
+    <button type="submit" class="fancy-btn">Search</button>
+  </form>
+  <div class="auctions-container">
+    <!-- Future auction listings will go here -->
+  </div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Manage Categories{% endblock %}
+{% block header %}
+  <h1>Manage Categories</h1>
+{% endblock %}
+{% block content %}
+  <section>
+    <h2>Add Category</h2>
+    <form method="post">
+      <label>Category name:
+        <input type="text" name="category_name" required />
+      </label>
+      <br />
+      <label>Detail names (comma-separated):
+        <input type="text" name="detail_names" placeholder="CPU, Memory, Disk" />
+      </label>
+      <br />
+      <button type="submit" class="fancy-btn">Create Category</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>Existing Categories</h2>
+    {% if categories %}
+      <ul>
+        {% for c in categories %}
+          <li>
+            {{ c.category_name }}
+            <form method="post"
+                  action="{{ url_for('admin.delete_category', category_id=c.category_id) }}"
+                  style="display:inline">
+              <button type="submit"
+                      class="fancy-btn"
+                      onclick="return confirm('Delete this category and its items?');">
+                Delete
+              </button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No categories defined.</p>
+    {% endif %}
+  </section>
+{% endblock %}

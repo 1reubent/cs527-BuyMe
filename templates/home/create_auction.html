@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block header %}
+  <h1>
+    {% block title %}
+      Create Auction
+    {% endblock title %}
+  </h1>
+{% endblock header %}
+{% block content %}
+  <!--
+  form for you to imput information about the auction:
+  - Auction Information:
+    - auction name
+    - description
+    - auction start/end datetimes
+  - Item
+    - auction item 
+    - details (specs, dimensions, etc.)
+  - Pricing Rules
+    - starting price
+    - bid increment 
+-->
+  <form id="new_auction_form"
+        action="{{ url_for('home.create_auction') }}"
+        method="post">
+    <h2>Auction Information</h2>
+    <label for="auction_title">Auction Title</label>
+    <input type="text"
+           name="auction_title"
+           id="auction_title"
+           placeholder="Auction Title"
+           value="{{ request.form['auction_title'] }}"
+           required
+           class />
+    <label for="auction_desc">Auction Description</label>
+    <textarea id="auction_desc"
+              name="auction_desc"
+              rows="10"
+              cols="50"
+              placeholder="Enter auction description..."
+              value="{{ request.form['auction_desc'] }}"
+              required></textarea>
+    {# TODO: auction starting price, start/end times #}
+    <!-- Auction Date and price information-->
+    <label for="starting_price">Enter starting price:</label>
+    <input type="number" id="starting_price" name="starting_price" step="0.01">
+    <label for="auction_start">Select Auction Start Date and Time:</label>
+    <input type="datetime-local" id="auction_start" name="auction_start">
+    <label for="auction_end">Select Auction End Date and Time:</label>
+    <input type="datetime-local" id="auction_end" name="auction_end">
+    {# dates get validated on form submit #}
+    <h2>Item Information</h2>
+    <label for="item_name">Item Name</label>
+    <input type="text"
+           name="item_name"
+           id="item_name"
+           placeholder="Item Name"
+           value="{{ request.form['item_name'] }}"
+           required />
+    <label for="item_desc">Item Description:</label>
+    <textarea id="item_desc"
+              name="item_desc"
+              rows="10"
+              cols="50"
+              placeholder="Enter item description..."
+              value="{{ request.form['item_desc'] }}"
+              required></textarea>
+    <label for="item_category">Item Category</label>
+    <select name="item_category" id="item_category" required>
+      {% for category in category_names_and_id.keys() %}
+        <option value="{{ category_names_and_id[category] }}"
+                {% if category == request.form['item_category'] %}selected{% endif %}>{{ category }}</option>
+      {% endfor %}
+    </select>
+    <div id="category_details">
+      <h4>Category Specific Details</h4>
+    </div>
+    <div id="item_details"></div>
+    <script>
+      const select = document.getElementById("item_category");
+      const item_details_div = document.getElementById("item_details");
+      const category_ids_and_details = {{ category_ids_and_details | tojson }}; 
+        //{# dictionary that links category_id : [detail_name and detail_id] #}
+      //TODO: update innerHTML with the correct details based on category
+      //TODO: search view, search button not styling???
+      
+      select.addEventListener('change', () => {
+        const category = select.value;
+        item_details_div.innerHTML = "" //clear all details
+        //{# console.log(category); #}
+        //TODO: for each category, update the HTML to have the details
+          // need to get the details from the database somehow
+            // maybe can pull from JS? or need to pass to template from API?
+        category_ids_and_details[category].forEach(([detail_name, detail_id]) => {
+          item_details_div.innerHTML +=
+          `
+          <label for="item_detail:${detail_id}">${detail_name}:</label>
+          <input type="text" name="item_detail:${detail_id}" id="item_detail:${detail_id}" placeholder="Enter ${detail_name}..." required />
+          `            
+        });
+      });
+    </script>
+    <button type="submit" class="fancy-btn">Create Auction</button>
+  </form>
+  <script>
+    // {# get auction times. if start > end: clear the inputs #}
+    document.getElementById('new_auction_form').addEventListener('submit', function(event) {
+      //{# validate dates #}
+      const auction_start = document.getElementById('auction_start');
+      const auction_end = document.getElementById('auction_end');
+      const startDate = new Date(auction_start.value);
+      const endDate = new Date(auction_end.value);
+
+      if (endDate <= startDate) {
+      alert('End date must be after start date.');
+          event.preventDefault(); // Stop the form submission
+          return false; // Optional, but good practice
+      }
+      // If the condition is met, the form will submit normally
+  });
+  </script>
+{% endblock content %}

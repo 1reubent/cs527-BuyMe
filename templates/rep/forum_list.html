@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Forum Questions{% endblock %}
+{% block header %}
+  <h1>User Questions</h1>
+{% endblock %}
+{% block content %}
+  {% if questions %}
+    <ul>
+      {% for q in questions %}
+        <li>
+          <a href="{{ url_for('rep.forum_detail', question_id=q.id) }}">
+            {{ q.title }}
+          </a>
+          by {{ q.asker_username }}
+          {% if q.has_answer %}- <em>Answered</em>{% else %}- <em>Pending</em>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No questions yet.</p>
+  {% endif %}
+{% endblock %}

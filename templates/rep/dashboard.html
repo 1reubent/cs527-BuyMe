@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Customer Representative Dashboard{% endblock %}
+{% block header %}
+  <h1>Customer Representative Dashboard</h1>
+{% endblock %}
+{% block content %}
+  <ul>
+    <li><a href="{{ url_for('rep.search_users') }}">Search / Modify Users</a></li>
+    <li><a href="{{ url_for('rep.forum') }}">Forum (Questions & Answers)</a></li>
+  </ul>
+{% endblock %}

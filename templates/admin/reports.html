@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Sales Reports{% endblock %}
+{% block header %}
+  <h1>Summary Sales Reports</h1>
+{% endblock %}
+{% block content %}
+  <section>
+    <h2>Total Earnings</h2>
+    <p><strong>${{ '%.2f'|format(total_earnings) }}</strong></p>
+  </section>
+
+  <section>
+    <h2>Earnings per Item</h2>
+    {% if earnings_per_item %}
+      <table>
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Earnings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, amount in earnings_per_item %}
+            <tr>
+              <td>{{ name }}</td>
+              <td>${{ '%.2f'|format(amount) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No item earnings available.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Earnings per Category</h2>
+    {% if earnings_per_category %}
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Earnings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, amount in earnings_per_category %}
+            <tr>
+              <td>{{ name }}</td>
+              <td>${{ '%.2f'|format(amount) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No category earnings available.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Earnings per Seller</h2>
+    {% if earnings_per_seller %}
+      <table>
+        <thead>
+          <tr>
+            <th>Seller</th>
+            <th>Earnings</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, amount in earnings_per_seller %}
+            <tr>
+              <td>{{ name }}</td>
+              <td>${{ '%.2f'|format(amount) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No seller earnings available.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Best-Selling Items</h2>
+    {% if best_items %}
+      <ol>
+        {% for name, amount in best_items %}
+          <li>{{ name }} - ${{ '%.2f'|format(amount) }}</li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p>No data.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Best-Selling End Users (Sellers)</h2>
+    {% if best_sellers %}
+      <ol>
+        {% for name, amount in best_sellers %}
+          <li>{{ name }} - ${{ '%.2f'|format(amount) }}</li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p>No data.</p>
+    {% endif %}
+  </section>
+{% endblock %}

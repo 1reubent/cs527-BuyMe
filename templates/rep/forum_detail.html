@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Question: {{ question.title }}{% endblock %}
+{% block header %}
+  <h1>{{ question.title }}</h1>
+  <p>Asked by {{ question.asker_username }} on {{ question.created_at }}</p>
+{% endblock %}
+{% block content %}
+  <section>
+    <h2>Question</h2>
+    <p>{{ question.body }}</p>
+  </section>
+
+  <section>
+    <h2>Answers</h2>
+    {% if answers %}
+      <ul>
+        {% for a in answers %}
+          <li>
+            <p>{{ a.body }}</p>
+            <small>By {{ a.rep_username }} on {{ a.created_at }}</small>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No answers yet.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Post an Answer</h2>
+    <form method="post">
+      <textarea name="body" rows="4" cols="60" required></textarea><br />
+      <button type="submit" class="fancy-btn">Submit Answer</button>
+    </form>
+  </section>
+{% endblock %}

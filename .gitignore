@@ -1,0 +1,36 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+venv/
+env/
+
+# Database files (already ignored by default, but explicit is good)
+*.sqlite3
+*.db
+instance/*.sqlite3
+
+# Lock files and build artifacts
+uv.lock
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation (move these to a docs/ folder)
+# *.pdf
+
+# Notes (move to docs/ or keep, your choice)
+notes.md
