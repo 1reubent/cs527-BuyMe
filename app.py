@@ -8,7 +8,6 @@ import pkgutil
 import sys
 
 
-
 def register_blueprints(app):
   """Register all blueprints"""
   from routes.auth import bp as auth_bp
@@ -17,6 +16,7 @@ def register_blueprints(app):
   from routes.auction import bp as auction_bp
   from routes.rep import bp as rep_bp
   from routes.admin import bp as admin_bp
+  from routes.alerts import bp as alerts_bp
 
   app.register_blueprint(auth_bp)
   app.register_blueprint(home_bp)
@@ -24,6 +24,8 @@ def register_blueprints(app):
   app.register_blueprint(auction_bp)
   app.register_blueprint(rep_bp)
   app.register_blueprint(admin_bp)
+  app.register_blueprint(alerts_bp)
+
 
 def create_app(config_name="default"):
   app = Flask(__name__)

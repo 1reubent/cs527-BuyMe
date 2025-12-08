@@ -74,7 +74,7 @@ header %}
         <a
           href="{{ url_for('auction.view', auction_id=auction['auction_id']) }}"
           class="action-btn"
-          >View Details</a
+          >View Auction</a
         >
         <!-- <a href="#" class="action-btn">Edit Auction</a> -->
       </div>
@@ -127,11 +127,11 @@ header %}
         </div>
       </div>
       <div class="auction-actions">
-        <a href="#" class="action-btn">View Auction</a>
-        {% if auction['auction_end'] > now %} {% if auction['bid_status'] !=
-        'WON' and auction['bid_status'] != 'LOST' %}
-        <a href="#" class="action-btn">Place Bid</a>
-        {% endif %} {% endif %}
+        <a
+          href="{{ url_for('auction.view', auction_id=auction['auction_id']) }}"
+          class="action-btn"
+          >View Auction</a
+        >
       </div>
     </div>
     {% endfor %}

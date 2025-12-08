@@ -14,6 +14,7 @@ from werkzeug.exceptions import abort
 
 from db import get_db
 from .auth import login_required
+from .alerts import create_alert
 
 bp = Blueprint("rep", __name__, url_prefix="/rep")
 
@@ -113,6 +114,95 @@ def edit_user(user_id):
     return redirect(url_for("rep.search_users", q=username))
 
   return render_template("rep/edit_user.html", user=user)
+
+
+# --- Auction monitoring --- #
+
+
+@bp.route("/auctions", methods=["GET"])
+@login_required
+@rep_required
+def list_auctions():
+  """
+  List all auctions so that a customer representative can inspect
+  and remove illegal ones.
+  """
+  db = get_db()
+  auctions = db.execute(
+    """
+    SELECT 
+      a.auction_id,
+      a.auction_title,
+      a.auction_desc,
+      a.auction_start,
+      a.auction_end,
+      i.item_name,
+      u.username AS seller_username
+    FROM auctions a
+    JOIN item i ON a.item_id = i.item_id
+    JOIN user u ON a.user_id = u.id
+    ORDER BY a.auction_start DESC
+    """
+  ).fetchall()
+
+  return render_template("rep/auctions.html", auctions=auctions)
+
+
+@bp.route("/auctions/<int:auction_id>/remove", methods=["POST"])
+@login_required
+@rep_required
+def remove_auction(auction_id):
+  """
+  Remove an illegal auction.
+  This deletes the auction and all associated bids
+  and sends alerts to the seller and any bidders.
+  """
+  db = get_db()
+  auction = db.execute(
+    """
+    SELECT a.auction_id, a.auction_title, u.id AS seller_id
+    FROM auctions a
+    JOIN user u ON a.user_id = u.id
+    WHERE a.auction_id = ?
+    """,
+    (auction_id,),
+  ).fetchone()
+
+  if auction is None:
+    abort(404, "Auction not found.")
+
+  # Collect bidders
+  bidders = db.execute(
+    """
+    SELECT DISTINCT user_id
+    FROM bid
+    WHERE auction_id = ?
+    """,
+    (auction_id,),
+  ).fetchall()
+
+  # Delete bids and the auction itself
+  db.execute("DELETE FROM bid WHERE auction_id = ?", (auction_id,))
+  db.execute("DELETE FROM auctions WHERE auction_id = ?", (auction_id,))
+  db.commit()
+
+  # Alerts
+  create_alert(
+    auction["seller_id"],
+    f"Your auction '{auction['auction_title']}' has been removed by a customer representative for violating site policy.",
+  )
+
+  for row in bidders:
+    uid = row["user_id"]
+    if uid == auction["seller_id"]:
+      continue
+    create_alert(
+      uid,
+      f"An auction you bid on ('{auction['auction_title']}') has been removed by a customer representative. Your bids are no longer valid.",
+    )
+
+  flash("Auction removed successfully.")
+  return redirect(url_for("rep.list_auctions"))
 
 
 # --- Forum (Q&A) --- #

@@ -340,3 +340,62 @@ def create_auction():
     category_ids_and_details=category_ids_and_details,
     category_names_and_id=category_names_and_id,
   )  # { category: [details] }
+
+
+@bp.route("/forum", methods=("GET", "POST"))
+def forum():
+  """Forum view - display questions and allow users to post new questions."""
+  db = get_db()
+
+  if request.method == "POST":
+    if g.user is None:
+      flash("You must be logged in to post a question.")
+      return redirect(url_for("auth.login"))
+
+    title = request.form.get("title", "").strip()
+    body = request.form.get("body", "").strip()
+
+    if not title:
+      flash("Title is required.")
+    elif not body:
+      flash("Question body is required.")
+    else:
+      try:
+        db.execute(
+          """
+          INSERT INTO forum_question (user_id, title, body)
+          VALUES (?, ?, ?)
+          """,
+          (g.user["id"], title, body),
+        )
+        db.commit()
+        flash("Your question has been posted!")
+        return redirect(url_for("home.forum"))
+      except db.Error as e:
+        flash(f"Database error: {e}")
+
+  # Fetch all forum questions with asker info and answer details
+  q_with_answers = db.execute(
+    """
+    SELECT 
+      q.id,
+      q.title,
+      q.body,
+      q.created_at,
+      u.username AS asker_username,
+      u.f_name,
+      u.l_name,
+      COUNT(a.id) AS answer_count,
+      MAX(a.body) AS latest_answer_body,
+      MAX(a.created_at) AS latest_answer_time,
+      MAX(rep.username) AS latest_answerer_username
+    FROM forum_question q
+    JOIN user u ON q.user_id = u.id
+    LEFT JOIN forum_answer a ON q.id = a.question_id
+    LEFT JOIN user rep ON a.rep_id = rep.id
+    GROUP BY q.id
+    ORDER BY q.created_at DESC
+    """
+  ).fetchall()
+
+  return render_template("home/forum.html", q_with_answers=q_with_answers)

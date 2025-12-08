@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}All Auctions{% endblock %}
+{% block header %}
+  <h1>All Auctions</h1>
+{% endblock %}
+{% block content %}
+  {% if auctions %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Item</th>
+          <th>Seller</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in auctions %}
+          <tr>
+            <td>{{ a.auction_id }}</td>
+            <td>{{ a.auction_title }}</td>
+            <td>{{ a.item_name }}</td>
+            <td>{{ a.seller_username }}</td>
+            <td>{{ a.auction_start }}</td>
+            <td>{{ a.auction_end }}</td>
+            <td>
+              <a href="{{ url_for('auction.view', auction_id=a.auction_id) }}">View</a>
+              <form action="{{ url_for('rep.remove_auction', auction_id=a.auction_id) }}"
+                    method="post"
+                    style="display:inline"
+                    onsubmit="return confirm('Remove this auction as illegal?');">
+                <button type="submit" class="fancy-btn">Remove</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No auctions found.</p>
+  {% endif %}
+{% endblock %}

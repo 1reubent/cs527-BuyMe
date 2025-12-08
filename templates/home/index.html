@@ -22,7 +22,6 @@
     <input type="text"
            name="q"
            placeholder="Search auctions or users..."
-           required
            class="search-input" />
     <select name="type" class="search-type">
       <option value="auction">Auctions</option>
@@ -32,7 +31,9 @@
   </form>
   <div class="home-layout">
     <main class="auctions-container">
-      <h2>Latest Auctions</h2>
+      <div class="auction-section">
+        <h2>Latest Auctions</h2>
+      </div>
       {% if auctions and auctions|length > 0 %}
       <div class="auctions-grid">
         {% for a in auctions %}

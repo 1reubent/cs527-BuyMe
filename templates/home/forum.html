@@ -1,0 +1,81 @@
+{% extends 'base.html' %} {% block title %}Forum - Ask Questions{% endblock %}
+{% block header %}
+<h1>Forum</h1>
+<p>Ask questions and get answers from our Customer Representatives.</p>
+{% endblock %} {% block content %}
+<!-- Post a Question Section -->
+<div class="profile-section">
+  <h2>Post a Question</h2>
+  {% if g.user %}
+  <form method="post" action="{{ url_for('home.forum') }}" class="forum-form">
+    <label for="title">Question Title:</label>
+    <input
+      type="text"
+      id="title"
+      name="title"
+      placeholder="Brief title of your question"
+      required
+    />
+
+    <label for="body">Question Details:</label>
+    <textarea
+      id="body"
+      name="body"
+      placeholder="Provide details about your question..."
+      rows="5"
+      required
+    ></textarea>
+
+    <button type="submit" class="fancy-btn">Post Question</button>
+  </form>
+  {% else %}
+  <p class="no-data">
+    You must be <a href="{{ url_for('auth.login') }}">logged in</a> to post a
+    question.
+  </p>
+  {% endif %}
+</div>
+
+<!-- Forum Questions Section -->
+<div class="profile-section">
+  <h2>Recent Questions</h2>
+  {% if q_with_answers and q_with_answers|length > 0 %}
+  <div class="forum-list">
+    {% for q in q_with_answers %}
+    <div class="forum-item">
+      <h3 class="forum-title">{{ q['title'] }}</h3>
+      <p class="forum-meta">
+        Asked by <strong>{{ q['asker_username'] }}</strong>
+        ({{ q['f_name'] or '' }} {{ q['l_name'] or '' }}) on {{ q['created_at']
+        }}
+      </p>
+      <p class="forum-body">{{ q['body'] }}</p>
+
+      <!-- Answer Display Section -->
+      <div class="forum-answer-section">
+        {% if q['answer_count'] and q['answer_count'] > 0 %}
+        <h4 class="answer-header">
+          <span class="answer-count"
+            >{{ q['answer_count'] }} Answer{{ 's' if q['answer_count'] != 1 else
+            '' }}</span
+          >
+        </h4>
+        <div class="forum-answer">
+          <p class="answer-meta">
+            Answered by <strong>{{ q['latest_answerer_username'] }}</strong> on
+            {{ q['latest_answer_time'] }}
+          </p>
+          <p class="answer-body">{{ q['latest_answer_body'] }}</p>
+        </div>
+        {% else %}
+        <p class="no-answer">No answers yet.</p>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="no-data">No questions yet. Be the first to ask!</p>
+  {% endif %}
+</div>
+{% endblock %}

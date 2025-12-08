@@ -72,6 +72,25 @@ INSERT INTO
     )
 VALUES
     (
+        'customer2',
+        'customer2',
+        'Customer2',
+        'Customer2',
+        'customer2@example.com',
+        'customer'
+    );
+
+INSERT INTO
+    user (
+        username,
+        password,
+        f_name,
+        l_name,
+        email,
+        user_type
+    )
+VALUES
+    (
         'representative',
         'representative',
         'Representative',
@@ -119,6 +138,11 @@ INSERT INTO
 VALUES
     ('iPhone 16', "random description iphone16", 4);
 
+INSERT INTO
+    item (item_name, item_desc, category_id)
+VALUES
+    ('Nikon D3500', "random description nikon", 5);
+
 -- Category-specific detail types (defines what details exist for each category)
 -- Laptop : CPU, Memory, Disk (would contain 3 rows in category_detail_type)
 -- Phone: Display, Battery, Camera, Storage
@@ -134,6 +158,7 @@ CREATE TABLE category_detail_type (
 INSERT INTO
     category_detail_type (category_id, detail_name)
 VALUES
+    (2, 'Brand'),
     (2, 'CPU'),
     (2, 'Memory'),
     (2, 'Disk');
@@ -142,10 +167,35 @@ VALUES
 INSERT INTO
     category_detail_type (category_id, detail_name)
 VALUES
+    (4, 'Brand'),
     (4, 'Display'),
     (4, 'Battery'),
     (4, 'Camera'),
     (4, 'Storage');
+
+-- for category 'Cameras' define detail types
+INSERT INTO
+    category_detail_type (category_id, detail_name)
+VALUES
+    (5, 'Brand'),
+    (5, 'Resolution'),
+    (5, 'Lens Type'),
+    (5, 'Sensor Size');
+
+-- for category 'Electronics' define detail types
+INSERT INTO
+    category_detail_type (category_id, detail_name)
+VALUES
+    (1, 'Brand'),
+    (1, 'Model Number');
+
+-- for category 'Gaming Laptops' define detail types
+INSERT INTO
+    category_detail_type (category_id, detail_name)
+VALUES
+    (3, 'Brand'),
+    (3, 'GPU'),
+    (3, 'Cooling System');
 
 -- Actual item details (stores values for each item/detail pair)
 CREATE TABLE item_detail (
@@ -161,21 +211,32 @@ CREATE TABLE item_detail (
 INSERT INTO
     item_detail (item_id, detail_type_id, detail_value)
 VALUES
-    (1, 1, 'Apple M4 Chip'),
+    -- Brand
+    (1, 1, 'Apple'),
     -- CPU
-    (1, 2, '16GB'),
+    (1, 2, 'Apple M4 Chip'),
     -- Memory
-    (1, 3, '512GB SSD');
+    (1, 3, '16GB'),
+    -- Disk
+    (1, 4, '512GB SSD');
 
--- Disk
 -- add iphone 16 specific details
 INSERT INTO
     item_detail (item_id, detail_type_id, detail_value)
 VALUES
-    (2, 4, '6.3-inch OLED 120Hz'),
-    (2, 5, '4350 mAh'),
-    (2, 6, '48MP Dual Camera'),
-    (2, 7, '256GB');
+    (2, 5, 'Apple'),
+    (2, 6, '6.3-inch OLED 120Hz'),
+    (2, 7, '4350 mAh'),
+    (2, 8, '48MP Dual Camera'),
+    (2, 9, '256GB');
+
+INSERT INTO
+    item_detail (item_id, detail_type_id, detail_value)
+VALUES
+    (3, 10, 'Nikon'),
+    (3, 11, '24.2MP'),
+    (3, 12, 'AF-P DX NIKKOR 18-55mm f/3.5-5.6G VR'),
+    (3, 13, 'APS-C');
 
 -- Auctions table
 CREATE TABLE auctions (
@@ -235,6 +296,27 @@ VALUES
         '2025-12-01 11:00:00'
     );
 
+INSERT INTO
+    auctions (
+        item_id,
+        auction_title,
+        auction_desc,
+        user_id,
+        starting_price,
+        auction_start,
+        auction_end
+    )
+VALUES
+    (
+        3,
+        'Selling mint condition Nikon D3500!!',
+        'This Nikon D3500 is in mint condition, with no scratches or dents. It has a beautiful display and a fast processor.',
+        3,
+        500.00,
+        '2025-12-01 10:00:00',
+        '2026-10-15 11:00:00'
+    );
+
 -- Bid table
 CREATE TABLE bid (
     bid_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -253,6 +335,30 @@ CREATE TABLE bid (
         )
     ),
     auction_bid_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (auction_id) REFERENCES auctions(auction_id),
+    FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+-- Alerts table: used by routes/alerts.py and auction notifications
+CREATE TABLE alert (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    message TEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_read INTEGER NOT NULL DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES user(id)
+);
+
+-- Automatic bidding configurations (auto_bid)
+-- Used by the auction auto-bidding logic: stores per-user max_bid and increment
+CREATE TABLE auto_bid (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    auction_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    max_bid DECIMAL(12, 2) NOT NULL,
+    increment DECIMAL(12, 2) NOT NULL DEFAULT 1.00,
+    active INTEGER NOT NULL DEFAULT 1,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (auction_id) REFERENCES auctions(auction_id),
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
@@ -292,6 +398,6 @@ INSERT INTO
 VALUES
     (
         1,
-        3,
+        4,
         'To place a bid, first log in to your account, navigate to the auction you are interested in, and enter your bid amount in the bid section. Make sure your bid is higher than the current highest bid.'
     );

@@ -3,17 +3,39 @@ endblock %} {% block header %}
 <h1>{{ auction.auction_title }}</h1>
 {% endblock %} {% block content %}
 <section>
+  <section>
+    <h2>Auction Details</h2>
+    <p><strong>Description:</strong> {{ auction.auction_desc }}</p>
+    <p>
+      <strong>Starting Price:</strong> ${{ '%.2f'|format(auction.starting_price)
+      }}
+    </p>
+    <p><strong>Auction Start:</strong> {{ auction.auction_start }}</p>
+    <p><strong>Auction End:</strong> {{ auction.auction_end }}</p>
+  </section>
+
   <h2>Item Information</h2>
   <p><strong>Item:</strong> {{ auction.item_name }}</p>
   <p><strong>Description:</strong> {{ auction.item_desc }}</p>
   <p><strong>Category:</strong> {{ auction.category_name }}</p>
+  {% if item_details and item_details|length > 0 %}
+  <div class="item-details">
+    <h3>Item Details</h3>
+    <ul>
+      {% for d in item_details %}
+      <li><strong>{{ d.detail_name }}:</strong> {{ d.detail_value }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
 </section>
 
 <section>
   <h2>Seller Information</h2>
   <p><strong>Seller:</strong> {{ auction.seller_username }}</p>
   <p>
-    <strong>Name:</strong> {{ auction.seller_fname }} {{ auction.seller_lname }}
+    <strong>Full Name:</strong> {{ auction.seller_fname }} {{
+    auction.seller_lname }}
   </p>
 </section>
 
@@ -31,8 +53,24 @@ endblock %} {% block header %}
 </section>
 
 <section>
-  <h2>Place a Bid</h2>
-  {% if g.user %} {% if g.user['id'] != auction.seller_id %}
+  <h2>Place a Manual Bid</h2>
+  {% if g.user %} {% if is_seller %}
+  <p class="no-data">
+    You are the seller of this auction and cannot place a bid.
+  </p>
+  <form>
+    <label for="bid_amount_disabled">Your bid amount:</label>
+    <input type="number" id="bid_amount_disabled" step="0.01" disabled />
+    <button type="button" class="fancy-btn" disabled>Place Bid</button>
+  </form>
+  {% elif is_over %}
+  <p class="no-data">This auction has ended; bidding is closed.</p>
+  <form>
+    <label for="bid_amount_disabled">Your bid amount:</label>
+    <input type="number" id="bid_amount_disabled" step="0.01" disabled />
+    <button type="button" class="fancy-btn" disabled>Place Bid</button>
+  </form>
+  {% else %}
   <form
     action="{{ url_for('auction.view', auction_id=auction.auction_id) }}"
     method="post"
@@ -47,18 +85,59 @@ endblock %} {% block header %}
     />
     <button type="submit" class="fancy-btn">Place Bid</button>
   </form>
-  {% else %}
-  <p class="no-data">
-    You are the seller of this auction and cannot place a bid.
-  </p>
-  <form>
-    <label for="bid_amount_disabled">Your bid amount:</label>
-    <input type="number" id="bid_amount_disabled" step="0.01" disabled />
-    <button type="button" class="fancy-btn" disabled>Place Bid</button>
-  </form>
   {% endif %} {% else %}
   <p><a href="{{ url_for('auth.login') }}">Log in</a> to place a bid.</p>
   {% endif %}
+</section>
+
+<section>
+  <h2>Automatic Bidding (Upper Limit)</h2>
+  {% if g.user %} {% if is_seller %}
+  <p class="no-data">
+    You are the seller and cannot configure auto-bidding for this auction.
+  </p>
+  {% elif is_over %}
+  <p class="no-data">This auction has ended; automatic bidding is disabled.</p>
+  {% else %}
+  <form
+    action="{{ url_for('auction.set_auto_bid', auction_id=auction.auction_id) }}"
+    method="post"
+  >
+    <label for="max_bid">Maximum bid you're willing to pay:</label>
+    <input
+      type="number"
+      name="max_bid"
+      id="max_bid"
+      step="0.01"
+      value="{{ auto_bid_config.max_bid if auto_bid_config else '' }}"
+      required
+    />
+    <br />
+    <label for="increment">Increment when auto-raising your bid:</label>
+    <input
+      type="number"
+      name="increment"
+      id="increment"
+      step="0.01"
+      value="{{ auto_bid_config.increment if auto_bid_config else '1.00' }}"
+      required
+    />
+    <br />
+    <button type="submit" class="fancy-btn">
+      {% if auto_bid_config %}Update Auto-Bid{% else %}Enable Auto-Bid{% endif
+      %}
+    </button>
+  </form>
+  {% endif %} {% else %}
+  <p>
+    <a href="{{ url_for('auth.login') }}">Log in</a> to configure automatic
+    bidding.
+  </p>
+  {% endif %}
+  <p class="help-text">
+    Once enabled, the system will automatically bid on your behalf up to your
+    maximum.
+  </p>
 </section>
 
 <section>
@@ -119,4 +198,18 @@ endblock %} {% block header %}
   <p>No similar recent auctions.</p>
   {% endif %}
 </section>
-{% endblock %}
+
+{% if g.user and g.user['user_type'] in ['representative', 'admin'] %}
+<section>
+  <h2>Representative Actions</h2>
+  <form
+    action="{{ url_for('rep.remove_auction', auction_id=auction.auction_id) }}"
+    method="post"
+    onsubmit="return confirm('Remove this auction as illegal?');"
+  >
+    <button type="submit" class="fancy-btn">
+      Remove This Auction as Illegal
+    </button>
+  </form>
+</section>
+{% endif %} {% endblock %}

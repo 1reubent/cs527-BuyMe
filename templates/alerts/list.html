@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Alerts{% endblock %}
+{% block header %}
+  <h1>Your Alerts</h1>
+{% endblock %}
+{% block content %}
+  {% if alerts %}
+    <ul>
+      {% for a in alerts %}
+        <li>
+          <strong>{{ a.created_at }}:</strong> {{ a.message }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No alerts.</p>
+  {% endif %}
+{% endblock %}

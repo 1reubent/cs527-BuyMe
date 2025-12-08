@@ -51,7 +51,7 @@ endblock %} {% block header %}
         <a
           href="{{ url_for('auction.view', auction_id=auction['auction_id']) }}"
           class="action-btn"
-          >View Details</a
+          >View Auction</a
         >
       </div>
     </div>
@@ -74,7 +74,7 @@ endblock %} {% block header %}
       <p class="auction-description">{{ auction['auction_desc'] }}</p>
       <div class="auction-details">
         <p class="detail-item">
-          <strong>Your Highest Bid:</strong> ${{
+          <strong>{{ user['username'] }}'s Highest Bid:</strong> ${{
           "%.2f"|format(auction['your_highest_bid']) }}
         </p>
         <p class="detail-item">
@@ -84,7 +84,7 @@ endblock %} {% block header %}
           yet {% endif %}
         </p>
         <p class="detail-item">
-          <strong>Your Bid Status:</strong>
+          <strong>{{ user['username'] }}'s Bid Status:</strong>
           <span class="bid-status bid-{{ auction['bid_status'].lower() }}"
             >{{ auction['bid_status'].title() }}</span
           >
@@ -105,10 +105,6 @@ endblock %} {% block header %}
           class="action-btn"
           >View Auction</a
         >
-        {% if auction['auction_end'] > now %} {% if auction['bid_status'] !=
-        'WON' and auction['bid_status'] != 'LOST' %}
-        <a href="#" class="action-btn">Place Bid</a>
-        {% endif %} {% endif %}
       </div>
     </div>
     {% endfor %}
