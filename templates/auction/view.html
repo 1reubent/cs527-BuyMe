@@ -1,111 +1,122 @@
-{% extends 'base.html' %}
-{% block title %}Auction {{ auction.auction_title }}{% endblock %}
-{% block header %}
-  <h1>{{ auction.auction_title }}</h1>
-{% endblock %}
-{% block content %}
-  <section>
-    <h2>Item Information</h2>
-    <p><strong>Item:</strong> {{ auction.item_name }}</p>
-    <p><strong>Description:</strong> {{ auction.item_desc }}</p>
-    <p><strong>Category:</strong> {{ auction.category_name }}</p>
-  </section>
+{% extends 'base.html' %} {% block title %}Auction {{ auction.auction_title }}{%
+endblock %} {% block header %}
+<h1>{{ auction.auction_title }}</h1>
+{% endblock %} {% block content %}
+<section>
+  <h2>Item Information</h2>
+  <p><strong>Item:</strong> {{ auction.item_name }}</p>
+  <p><strong>Description:</strong> {{ auction.item_desc }}</p>
+  <p><strong>Category:</strong> {{ auction.category_name }}</p>
+</section>
 
-  <section>
-    <h2>Seller Information</h2>
-    <p><strong>Seller:</strong> {{ auction.seller_username }}</p>
-    <p><strong>Name:</strong> {{ auction.seller_fname }} {{ auction.seller_lname }}</p>
-  </section>
+<section>
+  <h2>Seller Information</h2>
+  <p><strong>Seller:</strong> {{ auction.seller_username }}</p>
+  <p>
+    <strong>Name:</strong> {{ auction.seller_fname }} {{ auction.seller_lname }}
+  </p>
+</section>
 
-  <section>
-    <h2>Current Highest Bid</h2>
-    {% if highest_bid %}
-      <p><strong>Amount:</strong> ${{ '%.2f'|format(highest_bid.bid_price) }}</p>
-      <p><strong>Bidder:</strong> {{ highest_bid.bidder_username }}</p>
-      <p><strong>Time:</strong> {{ highest_bid.auction_bid_time }}</p>
-    {% else %}
-      <p>No bids yet. Starting price: ${{ '%.2f'|format(auction.starting_price) }}</p>
-    {% endif %}
-  </section>
+<section>
+  <h2>Current Highest Bid</h2>
+  {% if highest_bid %}
+  <p><strong>Amount:</strong> ${{ '%.2f'|format(highest_bid.bid_price) }}</p>
+  <p><strong>Bidder:</strong> {{ highest_bid.bidder_username }}</p>
+  <p><strong>Time:</strong> {{ highest_bid.auction_bid_time }}</p>
+  {% else %}
+  <p>
+    No bids yet. Starting price: ${{ '%.2f'|format(auction.starting_price) }}
+  </p>
+  {% endif %}
+</section>
 
-  <section>
-    <h2>Place a Bid</h2>
-    {% if g.user %}
-      {% if g.user['id'] != auction.seller_id %}
-        <form action="{{ url_for('auction.view', auction_id=auction.auction_id) }}" method="post">
-          <label for="bid_amount">Your bid amount:</label>
-          <input type="number" name="bid_amount" id="bid_amount" step="0.01" required />
-          <button type="submit" class="fancy-btn">Place Bid</button>
-        </form>
-      {% else %}
-        <p class="no-data">You are the seller of this auction and cannot place a bid.</p>
-        <form>
-          <label for="bid_amount_disabled">Your bid amount:</label>
-          <input type="number" id="bid_amount_disabled" step="0.01" disabled />
-          <button type="button" class="fancy-btn" disabled>Place Bid</button>
-        </form>
-      {% endif %}
-    {% else %}
-      <p><a href="{{ url_for('auth.login') }}">Log in</a> to place a bid.</p>
-    {% endif %}
-  </section>
+<section>
+  <h2>Place a Bid</h2>
+  {% if g.user %} {% if g.user['id'] != auction.seller_id %}
+  <form
+    action="{{ url_for('auction.view', auction_id=auction.auction_id) }}"
+    method="post"
+  >
+    <label for="bid_amount">Your bid amount:</label>
+    <input
+      type="number"
+      name="bid_amount"
+      id="bid_amount"
+      step="0.01"
+      required
+    />
+    <button type="submit" class="fancy-btn">Place Bid</button>
+  </form>
+  {% else %}
+  <p class="no-data">
+    You are the seller of this auction and cannot place a bid.
+  </p>
+  <form>
+    <label for="bid_amount_disabled">Your bid amount:</label>
+    <input type="number" id="bid_amount_disabled" step="0.01" disabled />
+    <button type="button" class="fancy-btn" disabled>Place Bid</button>
+  </form>
+  {% endif %} {% else %}
+  <p><a href="{{ url_for('auth.login') }}">Log in</a> to place a bid.</p>
+  {% endif %}
+</section>
 
-  <section>
-    <h2>Recent Bidders</h2>
-    {% if recent_bidders %}
-      <ul>
-        {% for b in recent_bidders %}
-          <li>{{ b.username }}</li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>No bidders yet.</p>
-    {% endif %}
-  </section>
+<section>
+  <h2>Recent Bidders</h2>
+  {% if recent_bidders %}
+  <ul>
+    {% for b in recent_bidders %}
+    <li>{{ b.username }}</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No bidders yet.</p>
+  {% endif %}
+</section>
 
-  <section>
-    <h2>Bid History</h2>
-    {% if bid_history %}
-      <table>
-        <thead>
-          <tr>
-            <th>Bidder</th>
-            <th>Amount</th>
-            <th>Time</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for b in bid_history %}
-            <tr>
-              <td>{{ b.bidder_username }}</td>
-              <td>${{ '%.2f'|format(b.bid_price) }}</td>
-              <td>{{ b.auction_bid_time }}</td>
-              <td>{{ b.bid_status }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    {% else %}
-      <p>No bids yet.</p>
-    {% endif %}
-  </section>
+<section>
+  <h2>Bid History</h2>
+  {% if bid_history %}
+  <table>
+    <thead>
+      <tr>
+        <th>Bidder</th>
+        <th>Amount</th>
+        <th>Time</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for b in bid_history %}
+      <tr>
+        <td>{{ b.bidder_username }}</td>
+        <td>${{ '%.2f'|format(b.bid_price) }}</td>
+        <td>{{ b.auction_bid_time }}</td>
+        <td>{{ b.bid_status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>No bids yet.</p>
+  {% endif %}
+</section>
 
-  <section>
-    <h2>Recommended Similar Items (last 30 days)</h2>
-    {% if similar_auctions %}
-      <ul>
-        {% for s in similar_auctions %}
-          <li>
-            <a href="{{ url_for('auction.view', auction_id=s.auction_id) }}">
-              {{ s.item_name }} - {{ s.auction_title }}
-            </a>
-            (Starting at ${{ '%.2f'|format(s.starting_price) }})
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p>No similar recent auctions.</p>
-    {% endif %}
-  </section>
+<section>
+  <h2>Recommended Similar Items (last 30 days)</h2>
+  {% if similar_auctions %}
+  <ul>
+    {% for s in similar_auctions %}
+    <li>
+      <a href="{{ url_for('auction.view', auction_id=s.auction_id) }}">
+        {{ s.item_name }} - {{ s.auction_title }}
+      </a>
+      (Starting at ${{ '%.2f'|format(s.starting_price) }})
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No similar recent auctions.</p>
+  {% endif %}
+</section>
 {% endblock %}
