@@ -21,7 +21,7 @@ bp = Blueprint("admin", __name__, url_prefix="/admin")
 def admin_required(view):
   @wraps(view)
   def wrapped_view(**kwargs):
-    if g.user is None or g.user.get("user_type") != "admin":
+    if g.user is None or g.user["user_type"] != "admin":
       abort(403)
     return view(**kwargs)
 
@@ -35,6 +35,7 @@ def dashboard():
 
 
 # --- Category management --- #
+
 
 @bp.route("/categories", methods=["GET", "POST"])
 @admin_required
@@ -101,6 +102,7 @@ def delete_category(category_id):
 
 # --- Create Customer Representative accounts --- #
 
+
 @bp.route("/create-rep", methods=["GET", "POST"])
 @admin_required
 def create_rep():
@@ -138,6 +140,7 @@ def create_rep():
 
 
 # --- Summary Sales Reports --- #
+
 
 @bp.route("/reports")
 @admin_required
@@ -185,7 +188,9 @@ def reports():
     earnings_per_seller[r["seller_username"]] += revenue
 
   items_sorted = sorted(earnings_per_item.items(), key=lambda x: x[1], reverse=True)
-  categories_sorted = sorted(earnings_per_category.items(), key=lambda x: x[1], reverse=True)
+  categories_sorted = sorted(
+    earnings_per_category.items(), key=lambda x: x[1], reverse=True
+  )
   sellers_sorted = sorted(earnings_per_seller.items(), key=lambda x: x[1], reverse=True)
 
   best_items = items_sorted[:5]

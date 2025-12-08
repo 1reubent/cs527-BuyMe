@@ -54,7 +54,7 @@
                   </p>
                 </div>
                 <div class="auction-actions">
-                  <a href="#" class="action-btn">View Details</a>
+                  <a href="{{ url_for('auction.view', auction_id=result['auction_id']) }}" class="action-btn">View Details</a>
                 </div>
               </div>
             {% endfor %}
@@ -72,7 +72,7 @@
                   <strong>Type:</strong> {{ result['user_type'] }}
                 </p>
                 <div class="auction-actions">
-                  <a href="#" class="action-btn">View Profile</a>
+                  <a href="{{ url_for('home.user_public', user_id=result['id']) }}" class="action-btn">View Profile</a>
                 </div>
               </div>
             {% endfor %}

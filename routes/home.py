@@ -28,7 +28,103 @@ bp = Blueprint(
 
 @bp.route("/")
 def index():
-  return render_template("home/index.html")
+  db = get_db()
+
+  # Recent auctions (latest listed first)
+  auctions = db.execute(
+    """
+    SELECT a.auction_id, a.auction_title, a.auction_desc, a.starting_price,
+           a.auction_start, a.auction_end, i.item_name, i.item_desc,
+           u.username AS seller_username, c.category_name
+    FROM auctions a
+    JOIN item i ON a.item_id = i.item_id
+    LEFT JOIN category c ON i.category_id = c.category_id
+    JOIN user u ON a.user_id = u.id
+    ORDER BY a.auction_start DESC
+    LIMIT 20
+    """
+  ).fetchall()
+
+  # Users grouped by type
+  users = db.execute(
+    """
+    SELECT id, username, f_name, l_name, user_type
+    FROM user
+    ORDER BY user_type, username
+    """
+  ).fetchall()
+
+  # group users into dict: admins, representatives, customers
+  grouped = {"admin": [], "representative": [], "customer": []}
+  for u in users:
+    t = u["user_type"] if u["user_type"] in grouped else "customer"
+    grouped[t].append(u)
+
+  return render_template(
+    "home/index.html",
+    auctions=auctions,
+    users_grouped=grouped,
+    now=datetime.now(),
+  )
+
+
+@bp.route("/user/<int:user_id>")
+def user_public(user_id):
+  """Public view of a user profile (read-only)."""
+  db = get_db()
+  user = db.execute(
+    """
+    SELECT id, username, f_name, l_name, user_type, COALESCE(email, '') AS email
+    FROM user
+    WHERE id = ?
+    """,
+    (user_id,),
+  ).fetchone()
+
+  if user is None:
+    abort(404, "User not found.")
+
+  # auctions created by this user
+  selling_auctions = db.execute(
+    """
+    SELECT a.auction_id, a.auction_title, a.auction_desc, a.starting_price,
+           a.auction_start, a.auction_end, i.item_name, i.item_desc, c.category_name
+    FROM auctions a
+    JOIN item i ON a.item_id = i.item_id
+    LEFT JOIN category c ON i.category_id = c.category_id
+    WHERE a.user_id = ?
+    ORDER BY a.auction_start DESC
+    """,
+    (user_id,),
+  ).fetchall()
+
+  # auctions the user has participated in (placed bids), excluding those they sold
+  participating_auctions = db.execute(
+    """
+    SELECT DISTINCT a.*, i.item_name, i.item_desc, c.category_name,
+           u.username as seller_username,
+           MAX(b.bid_price) as your_highest_bid,
+           b.bid_status,
+           a.current_highest_bid
+    FROM auctions a
+    JOIN item i ON a.item_id = i.item_id
+    LEFT JOIN category c ON i.category_id = c.category_id
+    JOIN user u ON a.user_id = u.id
+    JOIN bid b ON a.auction_id = b.auction_id
+    WHERE b.user_id = ? AND a.user_id != ?
+    GROUP BY a.auction_id
+    ORDER BY a.auction_start DESC
+    """,
+    (user_id, user_id),
+  ).fetchall()
+
+  return render_template(
+    "home/user_public.html",
+    user=user,
+    selling_auctions=selling_auctions,
+    participating_auctions=participating_auctions,
+    now=datetime.now(),
+  )
 
 
 @bp.route("/me")
@@ -201,7 +297,6 @@ def create_auction():
 
   # else get request:
   db = get_db()
-  user_id = g.user["id"]
   # want 2 hash tables:
   # { category_name: id}
   # { category_id: {detail_name: detail_id} }

@@ -71,6 +71,11 @@ def view(auction_id):
       flash("You must be logged in to place a bid.")
       return redirect(url_for("auth.login"))
 
+    # Prevent the seller from placing a bid on their own auction
+    if g.user["id"] == auction["seller_id"]:
+      flash("You cannot place a bid on your own auction.")
+      return redirect(url_for("auction.view", auction_id=auction_id))
+
     bid_amount_raw = request.form.get("bid_amount", "").strip()
     try:
       bid_amount = Decimal(bid_amount_raw)
@@ -116,6 +121,16 @@ def view(auction_id):
     )
     db.commit()
     flash("Bid placed successfully!")
+    # Update current highest bid in auctions table
+    db.execute(
+      """
+      UPDATE auctions
+      SET current_highest_bid = ?
+      WHERE auction_id = ?
+      """,
+      (float(bid_amount), auction_id),
+    )
+    db.commit()
     return redirect(url_for("auction.view", auction_id=auction_id))
 
   # Highest bid

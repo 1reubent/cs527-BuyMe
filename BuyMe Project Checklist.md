@@ -7,14 +7,14 @@
   - [x] **Create a New Auction Button** (right of header)
     - [x] Item sections with category dropdown; item details fields change based on category
       - [x] Add table for `item_category_details` (each category has unique fields)
-  - [ ] **My Profile** (in navigation)
+  - [x] **My Profile** (in navigation)
     - [x] Redirects to User Profile View
-    - [ ] Delete account functionality
+    - [x] Delete account functionality
   - [x] **Search Field**
     - [x] Text box | "Looking for…" dropdown (user, auction) | Active/inactive toggle?
     - [ ] On search, go to SearchView
       - [ ] Add “Show Filters” button on home page
-  - [ ] **List of Current Auctions** (left column)
+  - [x] **List of Current Auctions** (left column)
   - [ ] **Partial List of Users** (right column)
     - Click to “View All” (goes to User Search View)
 

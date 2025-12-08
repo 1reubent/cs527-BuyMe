@@ -21,7 +21,7 @@ bp = Blueprint("rep", __name__, url_prefix="/rep")
 def rep_required(view):
   @wraps(view)
   def wrapped_view(**kwargs):
-    if g.user is None or g.user.get("user_type") not in ("representative", "admin"):
+    if g.user is None or g.user["user_type"] not in ("representative", "admin"):
       abort(403)
     return view(**kwargs)
 
@@ -36,6 +36,7 @@ def dashboard():
 
 
 # --- User search & modify --- #
+
 
 @bp.route("/users", methods=["GET"])
 @login_required
@@ -115,6 +116,7 @@ def edit_user(user_id):
 
 
 # --- Forum (Q&A) --- #
+
 
 @bp.route("/forum")
 @login_required

@@ -30,7 +30,92 @@
     </select>
     <button type="submit" class="fancy-btn">Search</button>
   </form>
-  <div class="auctions-container">
-    <!-- Future auction listings will go here -->
+  <div class="home-layout">
+    <main class="auctions-container">
+      <h2>Latest Auctions</h2>
+      {% if auctions and auctions|length > 0 %}
+      <div class="auctions-grid">
+        {% for a in auctions %}
+        <div class="auction-card">
+          <h3 class="auction-title">{{ a['auction_title'] or a['item_name'] }}</h3>
+          <p class="auction-description">{{ a['auction_desc'] }}</p>
+          <div class="auction-details">
+            <p class="detail-item"><strong>Item:</strong> {{ a['item_name'] }}</p>
+            <p class="detail-item"><strong>Seller:</strong> {{ a['seller_username'] }}</p>
+            <p class="detail-item"><strong>Start:</strong> {{ a['auction_start'] }}</p>
+            <p class="detail-item"><strong>End:</strong> {{ a['auction_end'] }}</p>
+            <p class="detail-item"><strong>Starting:</strong> ${{ "%.2f"|format(a['starting_price']) }}</p>
+          </div>
+          <div class="auction-actions">
+            <a href="{{ url_for('auction.view', auction_id=a['auction_id']) }}" class="action-btn">View Details</a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <p class="no-data">No auctions available.</p>
+      {% endif %}
+    </main>
+
+    <aside class="users-sidebar">
+      <div class="profile-section">
+        <h2>Users</h2>
+        <div class="users-list">
+          {% if users_grouped.admin %}
+          <h4>Admins</h4>
+          <div class="users-grid">
+            {% for u in users_grouped.admin %}
+            <div class="user-card">
+              <h3>{{ u['username'] }}</h3>
+              <p class="detail-item">{{ u['f_name'] or '' }} {{ u['l_name'] or '' }}</p>
+              <div class="auction-actions">
+                <a href="{{ url_for('home.user_public', user_id=u['id']) }}" class="action-btn">View Profile</a>
+                {% if g.user and g.user['user_type'] in ['representative','admin'] %}
+                <a href="{{ url_for('rep.edit_user', user_id=u['id']) }}" class="action-btn">Manage</a>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if users_grouped.representative %}
+          <h4>Representatives</h4>
+          <div class="users-grid">
+            {% for u in users_grouped.representative %}
+            <div class="user-card">
+              <h3>{{ u['username'] }}</h3>
+              <p class="detail-item">{{ u['f_name'] or '' }} {{ u['l_name'] or '' }}</p>
+              <div class="auction-actions">
+                <a href="{{ url_for('home.user_public', user_id=u['id']) }}" class="action-btn">View Profile</a>
+                {% if g.user and g.user['user_type'] in ['representative','admin'] %}
+                <a href="{{ url_for('rep.edit_user', user_id=u['id']) }}" class="action-btn">Manage</a>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% if users_grouped.customer %}
+          <h4>Users</h4>
+          <div class="users-grid">
+            {% for u in users_grouped.customer %}
+            <div class="user-card">
+              <h3>{{ u['username'] }}</h3>
+              <p class="detail-item">{{ u['f_name'] or '' }} {{ u['l_name'] or '' }}</p>
+              <div class="auction-actions">
+                <a href="{{ url_for('home.user_public', user_id=u['id']) }}" class="action-btn">View Profile</a>
+                {% if g.user and g.user['user_type'] in ['representative','admin'] %}
+                <a href="{{ url_for('rep.edit_user', user_id=u['id']) }}" class="action-btn">Manage</a>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </aside>
   </div>
 {% endblock %}

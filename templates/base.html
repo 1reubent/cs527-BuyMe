@@ -16,6 +16,15 @@
       <li>
         <a href="{{ url_for("home.profile") }}">My Profile</a>
       </li>
+      {% if g.user['user_type'] == 'admin' %}
+        <li>
+          <a href="{{ url_for("admin.dashboard") }}">My Dashboard</a>
+        </li>
+      {% elif g.user['user_type'] == 'representative' %}
+        <li>
+          <a href="{{ url_for("rep.dashboard") }}">My Dashboard</a>
+        </li>
+      {% endif %}
     {% endif %}
   </ul>
   <ul>

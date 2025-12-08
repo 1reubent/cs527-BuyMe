@@ -422,6 +422,20 @@ input[type="submit"] {
   transform: translateY(0);
 }
 
+.danger-btn {
+  background: #cc2f2e;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.danger-btn:hover {
+  background: #a72824;
+}
+
 .auctions-container {
   margin-top: 2rem;
   min-height: 400px;
@@ -459,4 +473,30 @@ input[type="submit"] {
   font-weight: 600;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s;
+}
+
+/* Home layout: big auctions column + slim users sidebar */
+.home-layout {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.users-sidebar {
+  position: relative;
+}
+
+.user-card {
+  background: white;
+  border: 1px solid #e6e6e6;
+  border-radius: 6px;
+  padding: 0.6rem;
+  margin-bottom: 0.6rem;
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
 }

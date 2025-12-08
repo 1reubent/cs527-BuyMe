@@ -1,0 +1,121 @@
+{% extends 'base.html' %} {% block title %}User: {{ user['username'] }}{%
+endblock %} {% block header %}
+<h1>User Profile: {{ user['username'] }}</h1>
+{% endblock %} {% block content %}
+<div class="profile-section">
+  <h2>Basic Information</h2>
+  <div class="user-info">
+    <div class="info-item">
+      <strong>Username:</strong> {{ user['username'] }}
+    </div>
+    <div class="info-item">
+      <strong>Name:</strong> {{ user['f_name'] or '' }} {{ user['l_name'] or ''
+      }}
+    </div>
+    <div class="info-item">
+      <strong>Type:</strong> {{ user['user_type'].title() }}
+    </div>
+    <div class="info-item"><strong>User ID:</strong> {{ user['id'] }}</div>
+    <div class="info-item">
+      <strong>Email:</strong> {{ user['email'] or '—' }}
+    </div>
+  </div>
+</div>
+
+<div class="profile-section">
+  <h2>Auctions by {{ user['username'] }}</h2>
+  {% if selling_auctions and selling_auctions|length > 0 %}
+  <div class="auctions-grid">
+    {% for auction in selling_auctions %}
+    <div class="auction-card">
+      <h3 class="auction-title">
+        {{ auction['auction_title'] or auction['item_name'] }}
+      </h3>
+      <p class="auction-description">{{ auction['auction_desc'] }}</p>
+      <div class="auction-details">
+        <p class="detail-item">
+          <strong>Item:</strong> {{ auction['item_name'] }}
+        </p>
+        <p class="detail-item">
+          <strong>Start:</strong> {{ auction['auction_start'] }}
+        </p>
+        <p class="detail-item">
+          <strong>End:</strong> {{ auction['auction_end'] }}
+        </p>
+        <p class="detail-item">
+          <strong>Starting:</strong> ${{
+          "%.2f"|format(auction['starting_price']) }}
+        </p>
+      </div>
+      <div class="auction-actions">
+        <a
+          href="{{ url_for('auction.view', auction_id=auction['auction_id']) }}"
+          class="action-btn"
+          >View Details</a
+        >
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="no-data">No auctions found for this user.</p>
+  {% endif %}
+</div>
+
+<div class="profile-section">
+  <h2>Auctions {{ user['username'] }} Participated In</h2>
+  {% if participating_auctions and participating_auctions|length > 0 %}
+  <div class="auctions-grid">
+    {% for auction in participating_auctions %}
+    <div class="auction-card">
+      <h3 class="auction-title">
+        {{ auction['auction_title'] or auction['item_name'] }}
+      </h3>
+      <p class="auction-description">{{ auction['auction_desc'] }}</p>
+      <div class="auction-details">
+        <p class="detail-item">
+          <strong>Your Highest Bid:</strong> ${{
+          "%.2f"|format(auction['your_highest_bid']) }}
+        </p>
+        <p class="detail-item">
+          <strong>Current Highest Bid:</strong>
+          {% if auction['current_highest_bid'] %} ${{
+          "%.2f"|format(auction['current_highest_bid']) }} {% else %} No bids
+          yet {% endif %}
+        </p>
+        <p class="detail-item">
+          <strong>Your Bid Status:</strong>
+          <span class="bid-status bid-{{ auction['bid_status'].lower() }}"
+            >{{ auction['bid_status'].title() }}</span
+          >
+        </p>
+        <p class="detail-item">
+          <strong>Seller:</strong> {{ auction['seller_username'] }}
+        </p>
+        <p class="detail-item">
+          <strong>End Date:</strong> {{ auction['auction_end'] }}
+        </p>
+        <p class="detail-item">
+          <strong>Category:</strong> {{ auction['category_name'] }}
+        </p>
+      </div>
+      <div class="auction-actions">
+        <a
+          href="{{ url_for('auction.view', auction_id=auction['auction_id']) }}"
+          class="action-btn"
+          >View Auction</a
+        >
+        {% if auction['auction_end'] > now %} {% if auction['bid_status'] !=
+        'WON' and auction['bid_status'] != 'LOST' %}
+        <a href="#" class="action-btn">Place Bid</a>
+        {% endif %} {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="no-data">This user hasn't participated in any auctions yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

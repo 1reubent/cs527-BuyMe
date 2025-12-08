@@ -1,169 +1,183 @@
-{% extends 'base.html' %}
-{% block title %}User Profile{% endblock %}
-{% block header %}
-  <h1>User Profile</h1>
-  {% if g.user %}<a class="action" href="{{ url_for('home.profile') }}">Refresh</a>{% endif %}
-{% endblock %}
-{% block content %}
-  {% if g.user %}
-    <!-- User Information Section -->
-    <div class="profile-section">
-      <h2>Personal Information</h2>
-      <div class="user-info">
-        <div class="info-item">
-          <strong>Username:</strong> {{ g.user['username'] }}
+{% extends 'base.html' %} {% block title %}User Profile{% endblock %} {% block
+header %}
+<h1>User Profile</h1>
+{% if g.user %}<a class="action" href="{{ url_for('home.profile') }}">Refresh</a
+>{% endif %} {% endblock %} {% block content %} {% if g.user %}
+<!-- User Information Section -->
+<div class="profile-section">
+  <h2>Personal Information</h2>
+  <div class="user-info">
+    <div class="info-item">
+      <strong>Username:</strong> {{ g.user['username'] }}
+    </div>
+    <div class="info-item">
+      <strong>First Name:</strong> {{ g.user['f_name'] }}
+      <br />
+      <strong>Last Name:</strong> {{ g.user['l_name'] }}
+    </div>
+    <div class="info-item">
+      <strong>User Type:</strong> {{ g.user['user_type'].title() }}
+    </div>
+    <div class="info-item"><strong>User ID:</strong> {{ g.user['id'] }}</div>
+  </div>
+</div>
+<!-- Auctions Selling Section -->
+<div class="profile-section">
+  <h2>Auctions You're Selling</h2>
+  {% if selling_auctions %}
+  <div class="auctions-grid">
+    {% for auction in selling_auctions %}
+    <div class="auction-card">
+      <h3 class="auction-title">{{ auction['auction_title'] }}</h3>
+      <p class="auction-description-main">{{ auction['auction_desc'] }}</p>
+      <div class="item-info">
+        <h4 class="item-name">Item: {{ auction['item_name'] }}</h4>
+        <p class="item-description">{{ auction['item_desc'] }}</p>
+      </div>
+      <div class="auction-details">
+        <div class="detail-item">
+          <strong>Starting Price:</strong> ${{
+          "%.2f"|format(auction['starting_price']) }}
         </div>
-        <div class="info-item">
-          <strong>First Name:</strong> {{ g.user['f_name'] }}
-          <br>
-          <strong>Last Name:</strong> {{ g.user['l_name'] }}
+        <div class="detail-item">
+          <strong>Current Highest Bid:</strong>
+          {% if auction['current_highest_bid'] %} ${{
+          "%.2f"|format(auction['current_highest_bid']) }} {% else %} No bids
+          yet {% endif %}
         </div>
-        <div class="info-item">
-          <strong>User Type:</strong> {{ g.user['user_type'].title() }}
+        <div class="detail-item">
+          <strong>Start Date:</strong> {{
+          auction['auction_start'].strftime("%Y-%m-%d %H:%M") }}
         </div>
-        <div class="info-item">
-          <strong>User ID:</strong> {{ g.user['id'] }}
+        <div class="detail-item">
+          <strong>End Date:</strong> {{
+          auction['auction_end'].strftime("%Y-%m-%d %H:%M") }}
+        </div>
+        <div class="detail-item">
+          <strong>Category:</strong> {{ auction['category_name'] }}
+        </div>
+        <div class="detail-item">
+          <strong>Status:</strong>
+          {% if auction['auction_end'] < now %}
+          <span class="status-ended">Ended</span>
+          {% elif auction['auction_start'] > now %}
+          <span class="status-upcoming">Upcoming</span>
+          {% else %}
+          <span class="status-active">Active</span>
+          {% endif %}
         </div>
       </div>
-    </div>
-    <!-- Auctions Selling Section -->
-    <div class="profile-section">
-      <h2>Auctions You're Selling</h2>
-      {% if selling_auctions %}
-        <div class="auctions-grid">
-          {% for auction in selling_auctions %}
-            <div class="auction-card">
-              <h3 class="auction-title">{{ auction['auction_title'] }}</h3>
-              <p class="auction-description-main">{{ auction['auction_desc'] }}</p>
-              <div class="item-info">
-                <h4 class="item-name">Item: {{ auction['item_name'] }}</h4>
-                <p class="item-description">{{ auction['item_desc'] }}</p>
-              </div>
-              <div class="auction-details">
-                <div class="detail-item">
-                  <strong>Starting Price:</strong> ${{ "%.2f"|format(auction['starting_price']) }}
-                </div>
-                <div class="detail-item">
-                  <strong>Current Highest Bid:</strong>
-                  {% if auction['current_highest_bid'] %}
-                    ${{ "%.2f"|format(auction['current_highest_bid']) }}
-                  {% else %}
-                    No bids yet
-                  {% endif %}
-                </div>
-                <div class="detail-item">
-                  <strong>Start Date:</strong> {{ auction['auction_start'].strftime("%Y-%m-%d %H:%M") }}
-                </div>
-                <div class="detail-item">
-                  <strong>End Date:</strong> {{ auction['auction_end'].strftime("%Y-%m-%d %H:%M") }}
-                </div>
-                <div class="detail-item">
-                  <strong>Category:</strong> {{ auction['category_name'] }}
-                </div>
-                <div class="detail-item">
-                  <strong>Status:</strong>
-                  {% if auction['auction_end'] < now %}
-                    <span class="status-ended">Ended</span>
-                  {% elif auction['auction_start'] > now %}
-                    <span class="status-upcoming">Upcoming</span>
-                  {% else %}
-                    <span class="status-active">Active</span>
-                  {% endif %}
-                </div>
-              </div>
-              <div class="auction-actions">
-                <a href="#" class="action-btn">View Details</a>
-                <a href="#" class="action-btn">Edit Auction</a>
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p class="no-data">You haven't created any auctions yet.</p>
-      {% endif %}
-    </div>
-    <!-- Auctions Participated In Section -->
-    <div class="profile-section">
-      <h2>Auctions You've Participated In</h2>
-      {% if participating_auctions %}
-        <div class="auctions-grid">
-          {% for auction in participating_auctions %}
-            <div class="auction-card">
-              <h3 class="auction-title">{{ auction['auction_title'] }}</h3>
-              <p class="auction-description-main">{{ auction['auction_desc'] }}</p>
-              <div class="item-info">
-                <h4 class="item-name">Item: {{ auction['item_name'] }}</h4>
-                <p class="item-description">{{ auction['item_desc'] }}</p>
-              </div>
-              <div class="auction-details">
-                <div class="detail-item">
-                  <strong>Your Highest Bid:</strong> ${{ "%.2f"|format(auction['your_highest_bid']) }}
-                </div>
-                <div class="detail-item">
-                  <strong>Current Highest Bid:</strong>
-                  {% if auction['current_highest_bid'] %}
-                    ${{ "%.2f"|format(auction['current_highest_bid']) }}
-                  {% else %}
-                    No bids yet
-                  {% endif %}
-                </div>
-                <div class="detail-item">
-                  <strong>Your Bid Status:</strong>
-                  <span class="bid-status bid-{{ auction['bid_status'].lower() }}">{{ auction['bid_status'].title() }}</span>
-                </div>
-                <div class="detail-item">
-                  <strong>Seller:</strong> {{ auction['seller_username'] }}
-                </div>
-                <div class="detail-item">
-                  <strong>End Date:</strong> {{ auction['auction_end'].strftime("%Y-%m-%d %H:%M") }}
-                </div>
-                <div class="detail-item">
-                  <strong>Category:</strong> {{ auction['category_name'] }}
-                </div>
-              </div>
-              <div class="auction-actions">
-                <a href="#" class="action-btn">View Auction</a>
-                {% if auction['auction_end'] > now %}
-                  {% if auction['bid_status'] != 'WON' and auction['bid_status'] != 'LOST' %}
-                    <a href="#" class="action-btn">Place Bid</a>
-                  {% endif %}
-                {% endif %}
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% else %}
-        <p class="no-data">You haven't participated in any auctions yet.</p>
-      {% endif %}
-    </div>
-    <!-- Statistics Section -->
-    <div class="profile-section">
-      <h2>Your Statistics</h2>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h3>{{ selling_auctions|length }}</h3>
-          <p>Auctions Created</p>
-        </div>
-        <div class="stat-card">
-          <h3>{{ participating_auctions|length }}</h3>
-          <p>Auctions Participated</p>
-        </div>
-        <div class="stat-card">
-          <h3>{{ won_auctions|length if won_auctions else 0 }}</h3>
-          <p>Auctions Won</p>
-        </div>
-        <div class="stat-card">
-          <h3>${{ "%.2f"|format(total_spent) if total_spent else 0 }}</h3>
-          <p>Total Spent</p>
-        </div>
+      <div class="auction-actions">
+        <a
+          href="{{ url_for('auction.view', auction_id=auction['auction_id']) }}"
+          class="action-btn"
+          >View Details</a
+        >
+        <!-- <a href="#" class="action-btn">Edit Auction</a> -->
       </div>
     </div>
+    {% endfor %}
+  </div>
   {% else %}
-    <div class="login-prompt">
-      <h2>Please Log In</h2>
-      <p>You need to be logged in to view your profile.</p>
-      <a href="{{ url_for('auth.login') }}" class="action-btn">Log In</a>
-      <a href="{{ url_for('auth.register') }}" class="action-btn">Register</a>
-    </div>
+  <p class="no-data">You haven't created any auctions yet.</p>
   {% endif %}
-{% endblock %}
+</div>
+<!-- Auctions Participated In Section -->
+<div class="profile-section">
+  <h2>Auctions You've Participated In</h2>
+  {% if participating_auctions %}
+  <div class="auctions-grid">
+    {% for auction in participating_auctions %}
+    <div class="auction-card">
+      <h3 class="auction-title">{{ auction['auction_title'] }}</h3>
+      <p class="auction-description-main">{{ auction['auction_desc'] }}</p>
+      <div class="item-info">
+        <h4 class="item-name">Item: {{ auction['item_name'] }}</h4>
+        <p class="item-description">{{ auction['item_desc'] }}</p>
+      </div>
+      <div class="auction-details">
+        <div class="detail-item">
+          <strong>Your Highest Bid:</strong> ${{
+          "%.2f"|format(auction['your_highest_bid']) }}
+        </div>
+        <div class="detail-item">
+          <strong>Current Highest Bid:</strong>
+          {% if auction['current_highest_bid'] %} ${{
+          "%.2f"|format(auction['current_highest_bid']) }} {% else %} No bids
+          yet {% endif %}
+        </div>
+        <div class="detail-item">
+          <strong>Your Bid Status:</strong>
+          <span class="bid-status bid-{{ auction['bid_status'].lower() }}"
+            >{{ auction['bid_status'].title() }}</span
+          >
+        </div>
+        <div class="detail-item">
+          <strong>Seller:</strong> {{ auction['seller_username'] }}
+        </div>
+        <div class="detail-item">
+          <strong>End Date:</strong> {{
+          auction['auction_end'].strftime("%Y-%m-%d %H:%M") }}
+        </div>
+        <div class="detail-item">
+          <strong>Category:</strong> {{ auction['category_name'] }}
+        </div>
+      </div>
+      <div class="auction-actions">
+        <a href="#" class="action-btn">View Auction</a>
+        {% if auction['auction_end'] > now %} {% if auction['bid_status'] !=
+        'WON' and auction['bid_status'] != 'LOST' %}
+        <a href="#" class="action-btn">Place Bid</a>
+        {% endif %} {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <p class="no-data">You haven't participated in any auctions yet.</p>
+  {% endif %}
+</div>
+<!-- Statistics Section -->
+<div class="profile-section">
+  <h2>Your Statistics</h2>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>{{ selling_auctions|length }}</h3>
+      <p>Auctions Created</p>
+    </div>
+    <div class="stat-card">
+      <h3>{{ participating_auctions|length }}</h3>
+      <p>Auctions Participated</p>
+    </div>
+    <div class="stat-card">
+      <h3>{{ won_auctions|length if won_auctions else 0 }}</h3>
+      <p>Auctions Won</p>
+    </div>
+    <div class="stat-card">
+      <h3>${{ "%.2f"|format(total_spent) if total_spent else 0 }}</h3>
+      <p>Total Spent</p>
+    </div>
+  </div>
+</div>
+
+<!-- Danger zone: delete account -->
+<div class="profile-section">
+  <h2>Danger Zone</h2>
+  <p class="no-data">Permanently delete your account and all related data.</p>
+  <form
+    method="post"
+    action="{{ url_for('auth.delete') }}"
+    onsubmit="return confirm('Are you sure you want to permanently delete your account? This action cannot be undone.');"
+  >
+    <button type="submit" class="danger-btn">Delete Account</button>
+  </form>
+</div>
+
+{% else %}
+<div class="login-prompt">
+  <h2>Please Log In</h2>
+  <p>You need to be logged in to view your profile.</p>
+  <a href="{{ url_for('auth.login') }}" class="action-btn">Log In</a>
+  <a href="{{ url_for('auth.register') }}" class="action-btn">Register</a>
+</div>
+{% endif %} {% endblock %}

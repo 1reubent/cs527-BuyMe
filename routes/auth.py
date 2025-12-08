@@ -88,7 +88,13 @@ def login():
       session.clear()
       print(user)
       session["id"] = user["id"]  # pyright: ignore[reportOptionalMemberAccess]
-      return redirect(url_for("index"))
+      # redirect to /rep/dashboard or /index or /admin/dashboard based on user type
+      if user["user_type"] == "representative":
+        return redirect(url_for("rep.dashboard"))
+      elif user["user_type"] == "admin":
+        return redirect(url_for("admin.dashboard"))
+      else:
+        return redirect(url_for("index"))
 
     flash(error)
 
@@ -125,3 +131,49 @@ def login_required(view):
     return view(**kwargs)  # return original view
 
   return wrapped_view
+
+
+# Allow users to delete their own account. This will attempt to remove
+# related records (bids, forum posts, auctions and related items) and
+# then remove the user row. It requires the user to be logged in.
+@bp.route("/delete", methods=("POST",))
+@login_required
+def delete():
+  db = get_db()
+  user_id = g.user["id"]
+  try:
+    # remove bids made by the user
+    db.execute("DELETE FROM bid WHERE user_id = ?", (user_id,))
+
+    # remove forum answers where this user acted as a rep
+    db.execute("DELETE FROM forum_answer WHERE rep_id = ?", (user_id,))
+
+    # remove forum questions created by the user
+    db.execute("DELETE FROM forum_question WHERE user_id = ?", (user_id,))
+
+    # find auctions created by the user so we can remove referenced items
+    auctions = db.execute(
+      "SELECT auction_id, item_id FROM auctions WHERE user_id = ?",
+      (user_id,),
+    ).fetchall()
+
+    item_ids = [a["item_id"] for a in auctions]
+    for item_id in item_ids:
+      db.execute("DELETE FROM item_detail WHERE item_id = ?", (item_id,))
+      db.execute("DELETE FROM item WHERE item_id = ?", (item_id,))
+
+    # remove auctions created by the user
+    db.execute("DELETE FROM auctions WHERE user_id = ?", (user_id,))
+
+    # finally remove the user record
+    db.execute("DELETE FROM user WHERE id = ?", (user_id,))
+    db.commit()
+  except Exception as exc:  # pragma: no cover - defensive fallback
+    db.rollback()
+    flash("Could not delete account: " + str(exc))
+    return redirect(url_for("home.profile"))
+
+  # clear the session so user is logged out after deletion
+  session.clear()
+  flash("Your account has been deleted.")
+  return redirect(url_for("index"))
