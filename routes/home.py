@@ -282,8 +282,8 @@ def create_auction():
           auction_desc,
           g.user["id"],
           starting_price,  # starting price
-          auction_start,  # auction start
-          auction_end,  # auction end
+          datetime.fromisoformat(auction_start).isoformat(),
+          datetime.fromisoformat(auction_end).isoformat(),
         ),
       )
       db.commit()

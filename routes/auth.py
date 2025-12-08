@@ -1,5 +1,6 @@
 import functools
 import sqlite3
+from datetime import datetime
 
 from flask import (
   Blueprint,
@@ -114,6 +115,83 @@ def load_logged_in_user():
     g.user = None
   else:
     g.user = get_db().execute("SELECT * FROM user WHERE id = ?", (user_id,)).fetchone()
+
+  # Check for ended auctions and mark winners
+  _process_ended_auctions()
+
+
+def _process_ended_auctions():
+  """
+  Check for auctions that have ended and mark the highest bidder as WON.
+  Send an alert to the winning bidder.
+  This runs on every request via before_app_request.
+  """
+  db = get_db()
+  now = datetime.now()
+
+  # Find all auctions that have ended but haven't been processed yet
+  # (bid_status is still LEADING, not yet changed to WON)
+  ended_auctions = db.execute(
+    """
+    SELECT DISTINCT a.auction_id, a.auction_title
+    FROM auctions a
+    WHERE datetime(a.auction_end) < datetime('now')
+    AND EXISTS (
+      SELECT 1 FROM bid b
+      WHERE b.auction_id = a.auction_id
+      AND b.bid_status = 'LEADING'
+    )
+    """
+  ).fetchall()
+
+  print(ended_auctions)
+
+  for auction in ended_auctions:
+    auction_id = auction["auction_id"]
+    auction_title = auction["auction_title"]
+
+    # Get the highest bid (LEADING bid)
+    highest_bid = db.execute(
+      """
+      SELECT b.bid_id, b.user_id, b.bid_price
+      FROM bid b
+      WHERE b.auction_id = ? AND b.bid_status = 'LEADING'
+      ORDER BY b.bid_price DESC
+      LIMIT 1
+      """,
+      (auction_id,),
+    ).fetchone()
+
+    if highest_bid:
+      # Mark this bid as WON
+      db.execute(
+        "UPDATE bid SET bid_status = 'WON' WHERE bid_id = ?",
+        (highest_bid["bid_id"],),
+      )
+
+      # Mark all other bids as LOST
+      db.execute(
+        """
+        UPDATE bid
+        SET bid_status = 'LOST'
+        WHERE auction_id = ? AND bid_id != ? AND bid_status IN ('OUTBID', 'PLACED')
+        """,
+        (auction_id, highest_bid["bid_id"]),
+      )
+
+      # Create alert for winner
+      db.execute(
+        """
+        INSERT INTO alert (user_id, message)
+        VALUES (?, ?)
+        """,
+        (
+          highest_bid["user_id"],
+          f"Congratulations! You won the auction '{auction_title}' with a bid of ${highest_bid['bid_price']:.2f}",
+        ),
+      )
+
+      db.commit()
 
 
 # clear the session, so that load_logged_in_user won't load the user for subsequent requests
