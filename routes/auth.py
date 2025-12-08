@@ -27,6 +27,7 @@ def register():
     l_name = request.form["l_name"]
     username = request.form["username"]
     password = request.form["password"]
+    email = request.form["email"]
 
     db = get_db()
     error = None
@@ -39,18 +40,21 @@ def register():
       error = "First Name is required."
     elif not l_name:
       error = "Last Name is required."
+    elif not email:
+      error = "Email is required."
 
     user = db.execute("SELECT * FROM user WHERE username = ?", (username,)).fetchone()
 
     if error is None:
       try:
         db.execute(
-          "INSERT INTO user (username, password, f_name, l_name, user_type) VALUES (?, ?, ?, ?, ?)",
+          "INSERT INTO user (username, password, f_name, l_name, email, user_type) VALUES (?, ?, ?, ?, ?, ?)",
           (
             username,
             password,
             f_name,
             l_name,
+            email,
             "customer",
           ),
         )

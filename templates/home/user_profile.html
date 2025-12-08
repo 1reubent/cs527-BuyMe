@@ -19,6 +19,9 @@ header %}
       <strong>User Type:</strong> {{ g.user['user_type'].title() }}
     </div>
     <div class="info-item"><strong>User ID:</strong> {{ g.user['id'] }}</div>
+    <div class="info-item">
+      <strong>Email:</strong> {{ g.user['email'] or '—' }}
+    </div>
   </div>
 </div>
 <!-- Auctions Selling Section -->
