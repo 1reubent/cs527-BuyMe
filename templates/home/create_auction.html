@@ -84,21 +84,27 @@
       //TODO: update innerHTML with the correct details based on category
       //TODO: search view, search button not styling???
       
-      select.addEventListener('change', () => {
+      const updateDetails = () => {
         const category = select.value;
         item_details_div.innerHTML = "" //clear all details
         //{# console.log(category); #}
         //TODO: for each category, update the HTML to have the details
           // need to get the details from the database somehow
-            // maybe can pull from JS? or need to pass to template from API?
+        // maybe can pull from JS? or need to pass to template from API?
+        console.log(category);
         category_ids_and_details[category].forEach(([detail_name, detail_id]) => {
           item_details_div.innerHTML +=
           `
-          <label for="item_detail:${detail_id}">${detail_name}:</label>
-          <input type="text" name="item_detail:${detail_id}" id="item_detail:${detail_id}" placeholder="Enter ${detail_name}..." required />
+          <div class="detail-item">
+            <label for="item_detail:${detail_id}">${detail_name}:</label>
+            <input type="text" name="item_detail:${detail_id}" id="item_detail:${detail_id}" placeholder="Enter ${detail_name}..." required />
+          </div>
           `            
         });
-      });
+      };
+      
+      select.addEventListener('change', updateDetails);
+      updateDetails(); // Run on initial page load
     </script>
     <button type="submit" class="fancy-btn">Create Auction</button>
   </form>

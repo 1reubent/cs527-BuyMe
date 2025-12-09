@@ -333,7 +333,7 @@ def create_auction():
   }
 
   # print(categories[1]["category_name"])
-  print(category_ids_and_details)
+  # print(category_ids_and_details)
 
   return render_template(
     "home/create_auction.html",

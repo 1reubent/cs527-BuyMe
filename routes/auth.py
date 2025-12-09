@@ -144,8 +144,6 @@ def _process_ended_auctions():
     """
   ).fetchall()
 
-  print(ended_auctions)
-
   for auction in ended_auctions:
     auction_id = auction["auction_id"]
     auction_title = auction["auction_title"]
