@@ -1,3 +1,10 @@
+"""
+Auction routes and bidding logic.
+
+NOTE: All datetime values throughout this application are stored and compared in UTC.
+Use datetime.utcnow() for current time comparisons.
+"""
+
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 
@@ -170,7 +177,7 @@ def view(auction_id):
   ).fetchall()
 
   # normalize auction end to a datetime for comparisons
-  now = datetime.now()
+  now = datetime.utcnow()
   auction_end = auction["auction_end"]
   end_dt = None
   if isinstance(auction_end, str):
@@ -314,7 +321,7 @@ def view(auction_id):
   ).fetchall()
 
   # Recommended similar auctions (same category, past 30 days)
-  one_month_ago = datetime.now() - timedelta(days=30)
+  one_month_ago = datetime.utcnow() - timedelta(days=30)
   similar_auctions = db.execute(
     """
     SELECT 

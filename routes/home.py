@@ -1,4 +1,6 @@
 # define / route
+# NOTE: All datetime values throughout this application are stored and compared in UTC.
+# Use datetime.utcnow() for current time, and ensure auction start/end times are in UTC.
 from crypt import methods
 from multiprocessing import Value
 import re
@@ -64,7 +66,7 @@ def index():
     "home/index.html",
     auctions=auctions,
     users_grouped=grouped,
-    now=datetime.now(),
+    now=datetime.utcnow(),
   )
 
 
@@ -123,7 +125,7 @@ def user_public(user_id):
     user=user,
     selling_auctions=selling_auctions,
     participating_auctions=participating_auctions,
-    now=datetime.now(),
+    now=datetime.utcnow(),
   )
 
 
@@ -199,7 +201,7 @@ def profile():
     participating_auctions=participating_auctions,
     won_auctions=won_auctions,
     total_spent=total_spent,
-    now=datetime.now(),
+    now=datetime.utcnow(),
   )
 
 
@@ -216,8 +218,9 @@ def create_auction():
     auction_title = request.form["auction_title"]
     auction_desc = request.form["auction_desc"]
     starting_price = request.form["starting_price"]
-    auction_start = request.form["auction_start"]
-    auction_end = request.form["auction_end"]
+    # Use the UTC-converted values from the hidden fields
+    auction_start = request.form.get("auction_start_utc") or request.form["auction_start"]
+    auction_end = request.form.get("auction_end_utc") or request.form["auction_end"]
 
     item_name = request.form["item_name"]
     item_desc = request.form["item_desc"]
@@ -270,7 +273,19 @@ def create_auction():
         )
         db.commit()
 
-      # insert new auction TODO: need to get the rest of the auction info
+      # insert new auction
+      # The datetime values are already in UTC ISO format from the client-side JavaScript
+      # Parse them and store in the database
+      # Handle both ISO format (with 'T' and 'Z') and standard format
+      try:
+        # Try ISO format first (from UTC conversion)
+        start_dt = datetime.fromisoformat(auction_start.replace('Z', '+00:00'))
+        end_dt = datetime.fromisoformat(auction_end.replace('Z', '+00:00'))
+      except ValueError:
+        # Fallback to standard datetime-local format (though this shouldn't happen with the new form)
+        start_dt = datetime.strptime(auction_start, "%Y-%m-%dT%H:%M")
+        end_dt = datetime.strptime(auction_end, "%Y-%m-%dT%H:%M")
+      
       db.execute(
         """
         INSERT INTO auctions (item_id, auction_title, auction_desc, user_id, starting_price, auction_start, auction_end)
@@ -282,8 +297,8 @@ def create_auction():
           auction_desc,
           g.user["id"],
           starting_price,  # starting price
-          datetime.fromisoformat(auction_start).isoformat(),
-          datetime.fromisoformat(auction_end).isoformat(),
+          start_dt.strftime("%Y-%m-%d %H:%M:%S"),
+          end_dt.strftime("%Y-%m-%d %H:%M:%S"),
         ),
       )
       db.commit()

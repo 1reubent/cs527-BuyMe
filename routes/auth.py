@@ -1,6 +1,5 @@
 import functools
 import sqlite3
-from datetime import datetime
 
 from flask import (
   Blueprint,
@@ -125,17 +124,20 @@ def _process_ended_auctions():
   Check for auctions that have ended and mark the highest bidder as WON.
   Send an alert to the winning bidder.
   This runs on every request via before_app_request.
+
+  NOTE: All datetime values in the database MUST be stored in UTC format.
+  SQLite's datetime('now') returns UTC time, so we compare against it directly.
   """
   db = get_db()
-  now = datetime.now()
 
   # Find all auctions that have ended but haven't been processed yet
   # (bid_status is still LEADING, not yet changed to WON)
+  # Using datetime('now') in SQLite which returns UTC
   ended_auctions = db.execute(
     """
     SELECT DISTINCT a.auction_id, a.auction_title
     FROM auctions a
-    WHERE datetime(a.auction_end) < datetime('now')
+    WHERE datetime(a.auction_end) <= datetime('now')
     AND EXISTS (
       SELECT 1 FROM bid b
       WHERE b.auction_id = a.auction_id

@@ -112,7 +112,7 @@ def search():
     search_type=search_type,
     results=results,
     query=query,
-    now=datetime.now(),
+    now=datetime.utcnow(),
     categories=categories,
     selected_category_id=category_id,
     detail_query=detail_query,

@@ -44,10 +44,13 @@
     <!-- Auction Date and price information-->
     <label for="starting_price">Enter starting price:</label>
     <input type="number" id="starting_price" name="starting_price" step="0.01">
-    <label for="auction_start">Select Auction Start Date and Time:</label>
+    <label for="auction_start">Select Auction Start Date and Time (your local time):</label>
     <input type="datetime-local" id="auction_start" name="auction_start">
-    <label for="auction_end">Select Auction End Date and Time:</label>
+    <input type="hidden" id="auction_start_utc" name="auction_start_utc">
+    
+    <label for="auction_end">Select Auction End Date and Time (your local time):</label>
     <input type="datetime-local" id="auction_end" name="auction_end">
+    <input type="hidden" id="auction_end_utc" name="auction_end_utc">
     {# dates get validated on form submit #}
     <h2>Item Information</h2>
     <label for="item_name">Item Name</label>
@@ -109,20 +112,24 @@
     <button type="submit" class="fancy-btn">Create Auction</button>
   </form>
   <script>
-    // {# get auction times. if start > end: clear the inputs #}
+    // Convert local datetime to UTC before form submission
     document.getElementById('new_auction_form').addEventListener('submit', function(event) {
-      //{# validate dates #}
       const auction_start = document.getElementById('auction_start');
       const auction_end = document.getElementById('auction_end');
       const startDate = new Date(auction_start.value);
       const endDate = new Date(auction_end.value);
 
+      // Validate: end date must be after start date
       if (endDate <= startDate) {
-      alert('End date must be after start date.');
-          event.preventDefault(); // Stop the form submission
-          return false; // Optional, but good practice
+        alert('End date must be after start date.');
+        event.preventDefault();
+        return false;
       }
-      // If the condition is met, the form will submit normally
-  });
+
+      // Convert local datetime to UTC ISO format and store in hidden fields
+      // The backend will use these UTC values instead of the local datetime-local values
+      document.getElementById('auction_start_utc').value = startDate.toISOString();
+      document.getElementById('auction_end_utc').value = endDate.toISOString();
+    });
   </script>
 {% endblock content %}
