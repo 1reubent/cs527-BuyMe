@@ -128,7 +128,7 @@ def create_rep():
           INSERT INTO user (username, password, f_name, l_name, email, user_type)
           VALUES (?, ?, NULL, NULL, ?, 'representative')
           """,
-          (username, generate_password_hash(password), email),
+          (username, password, email),
         )
         db.commit()
         flash("Customer representative account created.")

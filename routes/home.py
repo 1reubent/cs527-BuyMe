@@ -219,7 +219,9 @@ def create_auction():
     auction_desc = request.form["auction_desc"]
     starting_price = request.form["starting_price"]
     # Use the UTC-converted values from the hidden fields
-    auction_start = request.form.get("auction_start_utc") or request.form["auction_start"]
+    auction_start = (
+      request.form.get("auction_start_utc") or request.form["auction_start"]
+    )
     auction_end = request.form.get("auction_end_utc") or request.form["auction_end"]
 
     item_name = request.form["item_name"]
@@ -279,13 +281,13 @@ def create_auction():
       # Handle both ISO format (with 'T' and 'Z') and standard format
       try:
         # Try ISO format first (from UTC conversion)
-        start_dt = datetime.fromisoformat(auction_start.replace('Z', '+00:00'))
-        end_dt = datetime.fromisoformat(auction_end.replace('Z', '+00:00'))
+        start_dt = datetime.fromisoformat(auction_start.replace("Z", "+00:00"))
+        end_dt = datetime.fromisoformat(auction_end.replace("Z", "+00:00"))
       except ValueError:
         # Fallback to standard datetime-local format (though this shouldn't happen with the new form)
         start_dt = datetime.strptime(auction_start, "%Y-%m-%dT%H:%M")
         end_dt = datetime.strptime(auction_end, "%Y-%m-%dT%H:%M")
-      
+
       db.execute(
         """
         INSERT INTO auctions (item_id, auction_title, auction_desc, user_id, starting_price, auction_start, auction_end)
